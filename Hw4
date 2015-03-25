@@ -33,12 +33,15 @@ L1:
 	LOOP	L1												;this method refers to ecx register to know how many times to loop
 
 	mov		ecx, lengthof ary								;move entire length of array in so you loop 'ecx' (whatever value stored in ecx) # of times	
+	mov		ebx, type ary
 	mov		esi, offset ary									;reset esi pointer register from middle to begining
-L2:
-	mov		eax, [esi]
-	call	writeint										;write what is in eax reg
-	add		esi, 4											;increment in dword chunks to iterate through each element of the aray
-	Loop	L2												;loop as many times as stored into the ecx register
+
+	call	dumpmem
+;L2:
+;	mov		eax, [esi]
+;	call	writeint										;write what is in eax reg
+	;add		esi, 4											;increment in dword chunks to iterate through each element of the aray
+	;Loop	L2												;loop as many times as stored into the ecx register
 
 	
 	exit
