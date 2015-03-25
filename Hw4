@@ -1,0 +1,46 @@
+; Sources:	http://www.programming.msjc.edu/asm/help/  
+TITLE Miles Per Gallon calculator				(main.asm)
+; Program Description:	Reverses elements in an array.
+; Author:				Tom Bernard
+; Date;					3/11/2015
+
+INCLUDE Irvine32.inc
+
+.data
+	ary		DWORD	1, 2, 3, 4, 5, 6, 7, 8, 9;	
+						
+.code
+main PROC	
+
+	mov		esi,	OFFSET ary								;moves distance in bytes of ary into index register(source) esi 
+	mov		edi,	OFFSET ary + sizeof ary					;moves distance in byte of ary into index reg(destination) edi 
+	mov		eax,	LENGTHOF ary							;temporarily use eax to hold # elements in array.
+	cdq
+	mov		ebx, 2											 
+	div		ebx												;div ary/2 and store divisor into e 
+	
+	mov		ecx, eax										;mov contents of eax into ecx(4 in this case so it will print 4 times for each register)
+	
+	sub		edi, 4											;remove 4 since 'OFFSET ary + sizeof ary' points you to the end of the last node(this moves it to front of node)
+L1:
+
+	mov		eax, [esi]										;move first half of ary(from index reg esi) into eax		(character by character!)
+	mov		ebx, [edi]										;move last half of ary (from index reg edi) in bl(lower part of ebx reg) 
+	mov		[edi], eax										;move first index(now in al) to edi(destination index reg)
+	mov		[esi], ebx										;move last index(now in bl) to esi(source index reg)
+	add		esi, 4											;increment in dword chunks (does first half of aray start at 1st and go forward 'ecx' times)
+	sub		edi, 4											;decrement in dword chunks (start at last element and work you way back )
+	LOOP	L1												;this method refers to ecx register to know how many times to loop
+
+	mov		ecx, lengthof ary								;move entire length of array in so you loop 'ecx' (whatever value stored in ecx) # of times	
+	mov		esi, offset ary									;reset esi pointer register from middle to begining
+L2:
+	mov		eax, [esi]
+	call	writeint										;write what is in eax reg
+	add		esi, 4											;increment in dword chunks to iterate through each element of the aray
+	Loop	L2												;loop as many times as stored into the ecx register
+
+	
+	exit
+main ENDP
+END main
