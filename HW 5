@@ -1,0 +1,61 @@
+
+;TITLE Table of Procedure Offsets (ProcTble.asm)
+; Character Mode Logger 
+; It uses the table to execute indirect procedure calls.
+INCLUDE Irvine32.inc
+.data
+    MAX	= 80
+	ModeIndex	BYTE	62	DUP(0)
+	CharInput	BYTE	MAX+1 DUP(?)
+	
+	
+
+.code
+main PROC
+
+mov		edx,	OFFSET	CharInput						;mov variable InpStr into edx
+mov		ecx,	MAX										;set the counter to 80
+call	ReadString
+
+call	WriteString
+
+mov		ecx,	lengthof CharInput
+mov		esi,	OFFSET CharInput 
+l1:														;upper case loop
+
+	mov eax, [esi]
+
+	cmp eax, 97
+	jg	Smaller
+	jl	Numbers
+
+	Bigger:
+	
+
+	Smaller:
+	
+
+	Numbers:
+
+
+	loop l1
+	mov		ecx,	lengthof CharInput
+	
+	mov		ecx,	lengthof CharInput
+	mov		esi,	OFFSET CharInput 
+l2:														;lower case loop
+	
+	loop l2
+	mov		ecx,	lengthof CharInput
+
+	mov		ecx,	lengthof CharInput
+	mov		esi,	OFFSET CharInput 
+l3:														;get number loop
+	
+	loop l3
+
+
+	call waitmsg
+	invoke exitprocess, 0
+main ENDP
+END main
