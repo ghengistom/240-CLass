@@ -1,0 +1,97 @@
+; Sources:				http://www.programming.msjc.edu/asm/help/  (*), kipirvine book 6thedition, lecture notes
+TITLE:					Get the mode of chars				(main.asm)
+; Program Description:	For each char find how often these chars occurs.
+; Author:				Tom Bernard
+; Date:					4/22/2015
+
+INCLUDE Irvine32.inc
+
+.data
+									;Setup for userinput utilized kipirvine notes
+MAX = 132							;max chars to read
+stringIn BYTE MAX+1 DUP (?)			;room for null
+ModeArray BYTE 62 DUP(0)
+prompt BYTE "Please enter a message ", 0
+spacechars byte ": ", 0
+
+.code
+Display PROC
+									;print the mode array to show how often a char occurs
+									;setup loop again
+		mov esi, offset ModeArray	;point back to ModeArray 
+		mov ecx, 62					;lode the loop count into counter register
+		mov ebx, 97d				;move 'a' since it's the startin char of ModeArray
+
+		printArray:
+			mov al, bl					;move lower portion of ebx into al
+			call writechar				;print the correspoding char as it iterates
+			mov edx, offset spacechars	;have edx hold ": " to be printed every iteration
+			call writestring			; print ": " 
+			mov dl, byte ptr [esi]		;dl hold address of ptr that is iterating through ModeArray
+			movzx eax, dl				;convert dl to 32bit for writedec function
+			call writedec				;print the number
+			mov al, 10d					;moving 10d into al will create a new line when you call writechar
+			call writechar				;print make a next line every iteration
+										;the next block of code tells where to be redirected
+			.if ebx == 122d				;when you get to 'z' mov 'A' into ebx
+				mov ebx, 65d 
+			.elseif ebx == 90d
+				mov ebx, 48d
+			.else 
+				inc ebx
+			.endif
+			inc esi
+	loop printArray
+	ret
+Display endP
+CharCount PROC
+mov edx, offset prompt
+	call writestring
+	
+									;Get the 2 components for the LOOP  size&address
+	mov edx, OFFSET stringIn		;use string input buffer from kippo's library store address into edx									
+	mov ecx, MAX					;Get length(# of elements) of array store in count register
+	call ReadString					;this is where user types in characters into computer
+	mov esi, edx					;save address(to esi) of user's input that gets stored into edx
+
+	findMode:
+		mov dl, BYTE PTR [esi]		; dl holds address pointed to (hold address of userinput buffer)
+		mov bl, dl					; Char processing happens in AL
+									; Check to see if between 0-Z 48-122
+		.IF bl >= 48d && bl <= 122d
+									; CASE: NUMBERS 0-9
+			.IF bl <= 57d
+				sub bl, 48d								
+				add bl, 52d
+									; CASE: Uppercase Letters
+			.ELSEIF bl >= 65d && bl <= 90d
+				sub bl, 65d			; subtract ascii value (A)
+				add bl, 26d			; Allign with freq segment
+									; CASE: Lowercase Letters
+			.ELSEIF bl >= 97d && bl	<= 122d
+				sub bl, 97d			; Remove character offset
+									; Allign with freq segment
+			.ENDIF
+									;bl will be holding some ascii value that will 
+									;be put into a category of the ModeArray
+		movzx edx, bl				; move contents of bl into
+		inc ModeArray[edx]			; Adding letter to frequency counter
+		.ENDIF
+		inc esi						; move to next element in array which is the user's input buffer
+	loop findMode
+	ret
+CharCount endP
+									;START OF MAIN
+main PROC
+	call CharCount
+	call Display	
+	Call WaitMsg
+	exit
+main endp
+end main
+
+;Setting up for DumpMem			;dumpmem procedure to check for debugging(not being used)
+	;mov esi, OFFSET ModeArray
+	;mov ecx, LENGTHOF ModeArray
+	;mov ebx, TYPE ModeArray
+	;Call DumpMem
