@@ -1,0 +1,214 @@
+INCLUDE Irvine32.inc
+
+.data
+MAX = 80
+charInput BYTE MAX+1 DUP (?)
+countArray BYTE 62 DUP(0)
+initialMessage BYTE "Please Enter A String",10,0
+resultsMessage BYTE "The following characters have been counted",10,0
+
+.code
+main proc
+
+   mov edx, OFFSET initialMessage
+   call WriteString    
+
+   ;This portion of our code will read in the string from the user
+   mov edx, OFFSET charInput
+   mov ecx, MAX
+   call ReadString
+ 
+   ;Initialize Data For Loop 1
+   mov ecx, MAX
+   mov esi, OFFSET charInput
+
+L1: ;Lowercase Loop
+   mov al, [esi]  ;This moves the content of the current element into the eax register
+
+   cmp al, 97
+   jge LARGERCASEONE
+   jmp FINISHCASEONE
+ 
+   LARGERCASEONE:
+   cmp al, 122
+   jle SMALLERCASEONE
+   jmp FINISHCASEONE
+ 
+   SMALLERCASEONE: ;Case - LOWERCASE character
+   sub al, 97
+   mov edi, OFFSET countArray
+   movzx ebx, al
+   add edi, ebx 
+   add edi, 26
+   mov eax, [edi]
+   add eax, 1
+   mov [edi], eax
+
+   FINISHCASEONE:
+   inc esi
+   loop L1
+ 
+   ;Initialize Data For Loop 2
+   mov ecx, MAX
+   mov esi, OFFSET charInput
+
+L2: ;Uppercase Loop
+   mov al, [esi]  ;This moves the content of the current element into the eax register
+ 
+   cmp al, 65
+   jge  LARGERCASETWO
+   jmp FINISHCASETWO
+ 
+   LARGERCASETWO:
+   cmp al, 90
+   jle SMALLERCASETWO
+   jmp FINISHCASETWO
+ 
+   SMALLERCASETWO: ;Case - LOWERCASE character
+   sub al, 65
+   mov edi, OFFSET countArray
+   movzx ebx, al
+   add edi, ebx
+   mov eax, [edi]
+   add eax, 1
+   mov [edi], eax
+ 
+   FINISHCASETWO:
+   inc esi
+   loop L2
+ 
+   ;Initialize Data For Loop 3
+   mov ecx, MAX
+   mov esi, OFFSET charInput
+
+L3: ;Number Loop
+   mov al, [esi]  ;This moves the content of the current element into the eax register
+ 
+   cmp al, 48
+   jge  LARGERCASETHREE
+   jmp FINISHCASETHREE
+ 
+   LARGERCASETHREE:
+   cmp al, 57
+   jle SMALLERCASETHREE
+   jmp FINISHCASETHREE
+ 
+   SMALLERCASETHREE: ;Case - LOWERCASE character
+   sub al, 48
+   mov edi, OFFSET countArray
+   movzx ebx, al
+   add edi, ebx 
+   add edi, 52
+   mov eax, [edi]
+   add eax, 1
+   mov [edi], eax
+ 
+   FINISHCASETHREE:
+   inc esi
+   loop L3
+
+   ;DISPLAY RESULTS TO USER
+   mov edx, OFFSET resultsMessage
+   call WriteString
+
+   mov esi, OFFSET countArray
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   mov ecx, 26
+   mov al, 65
+L4: 
+   mov bl, al
+   mov al, [esi]
+   cmp al, 0
+   jnz M1
+
+   mov al, bl
+   jmp Z1
+
+M1:
+   mov al, bl
+   call WriteChar
+   mov bl, al
+
+   mov al,'-'
+   call WriteChar
+
+   mov al, [esi]
+   call WriteDec
+   
+   mov al, 10
+   call WriteChar
+       
+   mov al, bl
+
+Z1:
+   inc al
+   inc esi
+   loop L4
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   mov ecx, 26
+   mov al, 97
+L5:
+   mov bl, al
+   mov al, [esi]
+   cmp al, 0
+   jnz M2
+
+   mov al, bl
+   jmp Z2
+
+M2:
+   mov al, bl
+   call WriteChar
+   mov bl, al
+
+   mov al,'-'
+   call WriteChar
+
+   mov al, [esi]
+   call WriteDec
+   
+   mov al, 10
+   call WriteChar
+       
+   mov al, bl 
+
+Z2:
+   inc al
+   inc esi
+   loop L5
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   mov ecx, 10
+   mov al, 48
+L6:
+   mov bl, al
+   mov al, [esi]
+   cmp al, 0
+   jnz M3
+
+   mov al, bl
+   jmp Z3
+
+M3:
+   mov al, bl
+   call WriteChar
+   mov bl, al
+
+   mov al, '-'
+   call WriteChar
+
+   mov al, [esi]
+   call WriteDec
+
+   mov al, 10
+   call WriteChar
+
+   mov al, bl
+
+Z3:
+   inc al
+   inc esi
+   loop L6
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   invoke ExitProcess,0
+main endp
+end main
